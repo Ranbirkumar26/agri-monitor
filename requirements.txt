@@ -1,7 +1,9 @@
+--upgrade pip
+
 Flask==3.0.0
 opencv-python-headless==4.8.1.78
-torch==2.1.0
-torchvision==0.16.0
+torch==2.8.0
+torchvision==0.15.2
 ultralytics==8.0.220
 Pillow==10.1.0
 gunicorn==21.2.0
