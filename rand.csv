@@ -1,0 +1,8 @@
+Plant_ID,Nitrogen_Level,Phosphorus_Level,Potassium_Level,Soil_Moisture,Soil_pH,Soil_Temperature
+101,45,22,30,60,6.5,24
+102,20,10,15,30,5.2,35
+103,70,35,50,75,6.8,22
+104,25,12,18,28,4.9,33
+105,55,28,35,65,7.0,26
+106,15,8,12,20,5.0,37
+107,60,30,40,70,6.6,23

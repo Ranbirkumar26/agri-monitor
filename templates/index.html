@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural Monitoring System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .video-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #27ae60;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+        
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-indicator.active {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-indicator.inactive {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .pulse {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .detections-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .panel-header h2 {
+            font-size: 1.5em;
+        }
+        
+        .detection-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .detection-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .detection-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .detection-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .type-disease {
+            background: #fee;
+            color: #c0392b;
+        }
+        
+        .type-weed {
+            background: #fef;
+            color: #8e44ad;
+        }
+        
+        .type-soil {
+            background: #efe;
+            color: #27ae60;
+        }
+        
+        .detection-time {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .detection-result {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .detection-location {
+            font-size: 14px;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .no-detections {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+        
+        .message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌾 Agricultural Monitoring System</h1>
+            <p>Real-time Leaf Disease Detection, Weed Identification & Soil Health Monitoring</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="video-section">
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="phoneIp">📱 Phone IP Address</label>
+                        <input type="text" id="phoneIp" placeholder="e.g., 192.168.1.100:8080">
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-secondary" onclick="setIP()">Set IP</button>
+                        <button class="btn-primary" onclick="startCamera()" id="startBtn">Start Camera</button>
+                        <button class="btn-danger" onclick="stopCamera()" id="stopBtn" disabled>Stop Camera</button>
+                    </div>
+                    
+                    <div id="message"></div>
+                </div>
+                
+                <div class="video-container">
+                    <img id="videoFeed" src="" alt="Video Feed">
+                    <div class="status-indicator inactive" id="status">
+                        <span class="pulse"></span>
+                        <span>Offline</span>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="diseaseCount">0</div>
+                        <div class="stat-label">Diseases Detected</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="weedCount">0</div>
+                        <div class="stat-label">Weeds Found</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="soilCount">0</div>
+                        <div class="stat-label">Soil Checks</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detections-panel">
+                <div class="panel-header">
+                    <h2>📊 Recent Detections</h2>
+                </div>
+                
+                <div class="detection-list" id="detectionList">
+                    <div class="no-detections">
+                        <p>No detections yet</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Start camera to begin monitoring</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let cameraRunning = false;
+        let detectionCounts = { disease: 0, weed: 0, soil: 0 };
+        
+        function showMessage(text, isError = false) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.className = `message ${isError ? 'error' : 'success'}`;
+            msgDiv.textContent = text;
+            setTimeout(() => msgDiv.textContent = '', 5000);
+        }
+        
+        async function setIP() {
+            const ip = document.getElementById('phoneIp').value.trim();
+            if (!ip) {
+                showMessage('Please enter IP address', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/set_ip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip })
+                });
+                const data = await response.json();
+                showMessage(data.message, !data.success);
+            } catch (error) {
+                showMessage('Error setting IP: ' + error.message, true);
+            }
+        }
+        
+        async function startCamera() {
+            try {
+                const response = await fetch('/start_camera', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    cameraRunning = true;
+                    document.getElementById('videoFeed').src = '/video_feed?' + new Date().getTime();
+                    document.getElementById('status').className = 'status-indicator active';
+                    document.getElementById('status').innerHTML = '<span class="pulse"></span><span>Live</span>';
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    showMessage(data.message);
+                    startDetectionPolling();
+                } else {
+                    showMessage(data.message, true);
+                }
+            } catch (error) {
+                showMessage('Error starting camera: ' + error.message, true);
+            }
+        }
+        
+        async function stopCamera() {
+            try {
+                const response = await fetch('/stop_camera', { method: 'POST' });
+                const data = await response.json();
+                
+                cameraRunning = false;
+                document.getElementById('videoFeed').src = '';
+                document.getElementById('status').className = 'status-indicator inactive';
+                document.getElementById('status').innerHTML = '<span class="pulse"></span><span>Offline</span>';
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                showMessage(data.message);
+            } catch (error) {
+                showMessage('Error stopping camera: ' + error.message, true);
+            }
+        }
+        
+        async function fetchDetections() {
+            try {
+                const response = await fetch('/detections');
+                const detections = await response.json();
+                updateDetectionList(detections);
+            } catch (error) {
+                console.error('Error fetching detections:', error);
+            }
+        }
+        
+        function updateDetectionList(detections) {
+            const listDiv = document.getElementById('detectionList');
+            
+            if (detections.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="no-detections">
+                        <p>No detections yet</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Start camera to begin monitoring</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Reset counts
+            detectionCounts = { disease: 0, weed: 0, soil: 0 };
+            
+            listDiv.innerHTML = detections.map(det => {
+                let typeClass = 'type-disease';
+                let icon = '🍃';
+                
+                if (det.type === 'Weed') {
+                    typeClass = 'type-weed';
+                    icon = '🌿';
+                    detectionCounts.weed++;
+                } else if (det.type === 'Soil_Health') {
+                    typeClass = 'type-soil';
+                    icon = '🌱';
+                    detectionCounts.soil++;
+                } else {
+                    detectionCounts.disease++;
+                }
+                
+                return `
+                    <div class="detection-item">
+                        <div class="detection-header">
+                            <span class="detection-type ${typeClass}">${icon} ${det.type.replace('_', ' ')}</span>
+                            <span class="detection-time">${det.timestamp}</span>
+                        </div>
+                        <div class="detection-result">${det.result}</div>
+                        <div class="detection-location">
+                            📍 ${det.lat}, ${det.lon}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update stats
+            document.getElementById('diseaseCount').textContent = detectionCounts.disease;
+            document.getElementById('weedCount').textContent = detectionCounts.weed;
+            document.getElementById('soilCount').textContent = detectionCounts.soil;
+        }
+        
+        function startDetectionPolling() {
+            fetchDetections();
+            setInterval(() => {
+                if (cameraRunning) {
+                    fetchDetections();
+                }
+            }, 2000);
+        }
+        
+        // Start polling detections on load
+        fetchDetections();
+        setInterval(fetchDetections, 5000);
+    </script>
+</body>
+</html>
