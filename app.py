@@ -136,7 +136,7 @@ class CameraProcessor:
         self.running = False
         self.phone_ip = None
         self.frame_count = 0
-        self.process_every_n_frames = 10
+        self.process_every_n_frames = 15
         self.last_processed_frame = None
         self.lock = threading.Lock()
     
