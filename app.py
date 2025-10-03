@@ -169,14 +169,17 @@ class CameraProcessor:
     def get_frame(self):
         if not self.running or not self.cap:
             return None
-        
+
         ret, frame = self.cap.read()
         if not ret:
             return None
-        
+
         frame = cv2.resize(frame, (640, 480))
         self.frame_count += 1
-        
+
+        # 🔄 Rotate frame by 90 degrees clockwise
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+
         # Process AI models every N frames
         if self.frame_count % self.process_every_n_frames == 0:
             annotated_frame = self.process_detections(frame)
@@ -188,7 +191,7 @@ class CameraProcessor:
                     annotated_frame = self.last_processed_frame
                 else:
                     annotated_frame = frame
-        
+
         return annotated_frame
     
     def process_detections(self, frame):
@@ -196,7 +199,7 @@ class CameraProcessor:
         h, w = frame.shape[:2]
         
         # Leaf disease detection
-        leaf_results = leaf_yolo.predict(source=frame, imgsz=416, conf=0.5, verbose=False)
+        leaf_results = leaf_yolo.predict(source=frame, imgsz=416, conf=0.7, verbose=False)
         leaf_boxes = leaf_results[0].boxes.xyxy.cpu().numpy()
         
         for box in leaf_boxes:
@@ -238,7 +241,7 @@ class CameraProcessor:
                 logger.log_result("Leaf_Disease", disease_name, gps)
         
         # Weed detection
-        weed_results = weed_yolo.predict(source=frame, imgsz=416, conf=0.5, verbose=False)
+        weed_results = weed_yolo.predict(source=frame, imgsz=416, conf=0.7, verbose=False)
         weed_boxes = weed_results[0].boxes.xyxy.cpu().numpy()
         
         for box in weed_boxes:
