@@ -136,7 +136,7 @@ class CameraProcessor:
         self.running = False
         self.phone_ip = None
         self.frame_count = 0
-        self.process_every_n_frames = 10
+        self.process_every_n_frames = 7
         self.last_processed_frame = None
         self.lock = threading.Lock()
     
@@ -199,7 +199,7 @@ class CameraProcessor:
         h, w = frame.shape[:2]
         
         # Leaf disease detection
-        leaf_results = leaf_yolo.predict(source=frame, imgsz=416, conf=0.7, verbose=False)
+        leaf_results = leaf_yolo.predict(source=frame, imgsz=416, conf=0.5, verbose=False)
         leaf_boxes = leaf_results[0].boxes.xyxy.cpu().numpy()
         
         for box in leaf_boxes:
@@ -241,7 +241,7 @@ class CameraProcessor:
                 logger.log_result("Leaf_Disease", disease_name, gps)
         
         # Weed detection
-        weed_results = weed_yolo.predict(source=frame, imgsz=416, conf=0.7, verbose=False)
+        weed_results = weed_yolo.predict(source=frame, imgsz=416, conf=0.5, verbose=False)
         weed_boxes = weed_results[0].boxes.xyxy.cpu().numpy()
         
         for box in weed_boxes:
